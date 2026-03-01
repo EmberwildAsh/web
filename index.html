@@ -1,682 +1,705 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天气查询</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>哦哦哦哦哦</title>
+    <!-- Jelly-style cute Chinese font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* 背景动画粒子 */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            animation: float 15s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(50px);
-                opacity: 0;
-            }
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        h1 {
-            text-align: center;
-            color: white;
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            animation: fadeInDown 1s ease;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: rgba(255,255,255,0.9);
-            font-size: 1.2rem;
-            margin-bottom: 40px;
-            animation: fadeInDown 1s ease 0.2s backwards;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .controls {
-            text-align: center;
-            margin-bottom: 40px;
-            animation: fadeIn 1s ease 0.4s backwards;
-        }
-
-        .add-card-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            font-weight: bold;
-        }
-
-        .add-card-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-
-        .add-card-btn:active {
-            transform: translateY(-1px);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            padding: 20px 0;
-        }
-
-        .weather-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 25px;
-            padding: 30px;
-            position: relative;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            animation: cardFadeIn 0.6s ease backwards;
-        }
-
-        @keyframes cardFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8) translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .weather-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
-        }
-
-        .weather-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 100%);
-            pointer-events: none;
-        }
-
-        .card-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .city-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-            outline: none;
-            cursor: pointer;
-            flex: 1;
-            min-width: 0;
-            margin-right: 10px;
-        }
-
-        .city-name:hover {
-            border-bottom-color: #667eea;
-        }
-
-        .city-name:focus {
-            border-bottom-color: #f5576c;
-        }
-
-        .delete-btn {
-            background: #ff4444;
-            color: white;
-            border: 3px solid white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5rem;
-            font-weight: bold;
-            line-height: 1;
-            transition: all 0.3s ease;
-            display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-family: 'ZCOOL KuaiLe', cursive, sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #e8eaf6 30%, #e0f7fa 60%, #fff9c4 100%);
+            background-size: 300% 300%;
+            animation: bgShift 12s ease-in-out infinite;
             position: relative;
-            z-index: 100;
-            flex-shrink: 0;
         }
 
-        .delete-btn:hover {
-            transform: rotate(90deg) scale(1.1);
-            box-shadow: 0 8px 20px rgba(255,82,82,0.5);
-        }
+        @keyframes bgShift {
 
-        .weather-icon {
-            font-size: 5rem;
-            text-align: center;
-            margin: 30px 0;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
+            0%,
+            100% {
+                background-position: 0% 50%;
             }
+
+            25% {
+                background-position: 100% 0%;
+            }
+
             50% {
-                transform: translateY(-20px);
+                background-position: 100% 100%;
+            }
+
+            75% {
+                background-position: 0% 100%;
             }
         }
 
-        .temperature {
-            text-align: center;
-            font-size: 3.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
+        /* ---- Cute floating shapes background ---- */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle 120px at 15% 20%, rgba(255, 154, 158, 0.25) 0%, transparent 100%),
+                radial-gradient(circle 100px at 80% 30%, rgba(161, 196, 253, 0.25) 0%, transparent 100%),
+                radial-gradient(circle 90px at 25% 75%, rgba(162, 255, 195, 0.2) 0%, transparent 100%),
+                radial-gradient(circle 110px at 70% 80%, rgba(253, 203, 110, 0.2) 0%, transparent 100%),
+                radial-gradient(circle 80px at 50% 50%, rgba(214, 162, 232, 0.15) 0%, transparent 100%);
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .weather-desc {
-            text-align: center;
-            font-size: 1.3rem;
-            color: #666;
-            margin-bottom: 25px;
-            text-transform: capitalize;
-        }
-
-        .weather-details {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .detail-item {
-            text-align: center;
-            padding: 15px 10px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .detail-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        .detail-icon {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-
-        .detail-label {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .detail-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #333;
-        }
-
-        /* 天气类型背景色 */
-        .weather-card.sunny {
-            background: linear-gradient(135deg, #FFF59D 0%, #FFE082 100%);
-        }
-
-        .weather-card.cloudy {
-            background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%);
-        }
-
-        .weather-card.rainy {
-            background: linear-gradient(135deg, #90CAF9 0%, #64B5F6 100%);
-        }
-
-        .weather-card.snowy {
-            background: linear-gradient(135deg, #FFFFFF 0%, #E3F2FD 100%);
-        }
-
-        .weather-card.stormy {
-            background: linear-gradient(135deg, #78909C 0%, #546E7A 100%);
-        }
-
-        .refresh-icon {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-size: 1.5rem;
-            cursor: pointer;
+        /* ---- Floating decorations (CSS only, no canvas!) ---- */
+        .deco {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            font-size: 28px;
             opacity: 0.5;
-            transition: all 0.3s ease;
+            animation: decoFloat linear infinite;
         }
 
-        .refresh-icon:hover {
-            opacity: 1;
-            transform: rotate(180deg);
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .subtitle {
-                font-size: 1rem;
+        @keyframes decoFloat {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
             }
 
-            .cards-grid {
-                grid-template-columns: 1fr;
+            25% {
+                transform: translateY(-25vh) rotate(90deg) scale(1.1);
             }
 
-            .temperature {
-                font-size: 2.5rem;
+            50% {
+                transform: translateY(-50vh) rotate(180deg) scale(0.9);
             }
 
-            .weather-icon {
-                font-size: 4rem;
+            75% {
+                transform: translateY(-75vh) rotate(270deg) scale(1.05);
+            }
+
+            100% {
+                transform: translateY(-110vh) rotate(360deg) scale(1);
             }
         }
 
-        /* 加载动画 */
-        .loading {
+        /* ============================================================
+           MAIN TEXT CONTAINER
+           ============================================================ */
+        .scene {
             position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
         }
 
-        .loading::after {
+        .text-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        /* ---- INDIVIDUAL CHARACTER ---- */
+        .char {
+            position: relative;
+            font-size: clamp(60px, 12vw, 140px);
+            font-weight: 400;
+            display: inline-block;
+            cursor: default;
+            /* Initial state: hidden, will be animated by JS */
+            opacity: 0;
+            transform: scale(0);
+            /* Jelly text styling */
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            /* will be set per-char via JS for unique colors */
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+        }
+
+        /* Jelly shine highlight */
+        .char::after {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top-color: #667eea;
+            top: 12%;
+            left: 25%;
+            width: 35%;
+            height: 22%;
+            background: radial-gradient(ellipse, rgba(255, 255, 255, 0.55) 0%, transparent 70%);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            pointer-events: none;
+            transform: rotate(-15deg);
         }
 
-        @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
+        /* ---- Hover bounce ---- */
+        .char:hover {
+            transform: scale(1.25) translateY(-12px) rotate(-5deg) !important;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.12)) brightness(1.1);
+        }
+
+        /* ---- Entrance animation class ---- */
+        .char.entering {
+            animation: charRunIn var(--enter-duration, 1.2s) cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes charRunIn {
+            0% {
+                opacity: 0;
+                transform: translate(var(--enter-x, 0px), var(--enter-y, 200px)) scale(0.2) rotate(var(--enter-rot, 0deg));
+            }
+
+            40% {
+                opacity: 1;
+                transform: translate(0, -15px) scale(1.15) rotate(0deg);
+            }
+
+            55% {
+                transform: translate(0, 8px) scale(0.9) rotate(2deg);
+            }
+
+            70% {
+                transform: translate(0, -6px) scale(1.08) rotate(-1deg);
+            }
+
+            82% {
+                transform: translate(0, 3px) scale(0.97) rotate(0.5deg);
+            }
+
+            92% {
+                transform: translate(0, -2px) scale(1.02) rotate(0deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+        }
+
+        /* ---- Idle animations (applied randomly by JS) ---- */
+        .char.idle-bounce {
+            animation: idleBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes idleBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            30% {
+                transform: translateY(-20px) scale(1.08, 0.92);
+            }
+
+            50% {
+                transform: translateY(5px) scale(0.95, 1.06);
+            }
+
+            70% {
+                transform: translateY(-8px) scale(1.03, 0.97);
+            }
+        }
+
+        .char.idle-wiggle {
+            animation: idleWiggle 0.5s ease-in-out;
+        }
+
+        @keyframes idleWiggle {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            20% {
+                transform: rotate(-12deg);
+            }
+
+            40% {
+                transform: rotate(10deg);
+            }
+
+            60% {
+                transform: rotate(-6deg);
+            }
+
+            80% {
+                transform: rotate(4deg);
+            }
+        }
+
+        .char.idle-squish {
+            animation: idleSquish 0.5s ease-in-out;
+        }
+
+        @keyframes idleSquish {
+
+            0%,
+            100% {
+                transform: scale(1, 1);
+            }
+
+            25% {
+                transform: scale(1.15, 0.85);
+            }
+
+            50% {
+                transform: scale(0.9, 1.12);
+            }
+
+            75% {
+                transform: scale(1.05, 0.95);
+            }
+        }
+
+        .char.idle-peek {
+            animation: idlePeek 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes idlePeek {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            30% {
+                transform: translateY(-10px) rotate(8deg);
+            }
+
+            60% {
+                transform: translateY(-5px) rotate(-5deg);
+            }
+        }
+
+        .char.idle-jiggle {
+            animation: idleJiggle 0.4s ease-in-out;
+        }
+
+        @keyframes idleJiggle {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            50% {
+                transform: translateX(6px);
+            }
+
+            75% {
+                transform: translateX(-3px);
+            }
+        }
+
+        /* ---- Little animal ears/features on chars (CSS) ---- */
+        .char .ear-left,
+        .char .ear-right {
+            position: absolute;
+            top: -12px;
+            width: 18px;
+            height: 22px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .char .ear-left {
+            left: 15%;
+            transform: rotate(-20deg) scale(0.8);
+        }
+
+        .char .ear-right {
+            right: 15%;
+            transform: rotate(20deg) scale(0.8);
+        }
+
+        .char:hover .ear-left,
+        .char:hover .ear-right {
+            opacity: 1;
+            transform: rotate(0deg) scale(1) translateY(-5px);
+        }
+
+        .char .blush-left,
+        .char .blush-right {
+            position: absolute;
+            bottom: 25%;
+            width: 14px;
+            height: 9px;
+            border-radius: 50%;
+            background: rgba(255, 150, 150, 0.5);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .char .blush-left {
+            left: 8%;
+        }
+
+        .char .blush-right {
+            right: 8%;
+        }
+
+        .char:hover .blush-left,
+        .char:hover .blush-right {
+            opacity: 1;
+        }
+
+        /* ============================================================
+           SUBTITLE
+           ============================================================ */
+        .subtitle {
+            color: rgba(180, 130, 160, 0.7);
+            font-size: clamp(14px, 2.5vw, 22px);
+            letter-spacing: 0.3em;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: subtitleIn 1.5s ease 3.5s forwards;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes subtitleIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+           CLICK HEARTS
+           ============================================================ */
+        .click-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: heartPop 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes heartPop {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(var(--rot));
+            }
+        }
+
+        /* ============================================================
+           SPARKLE PARTICLES
+           ============================================================ */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: sparkleFade 2.5s ease-out forwards;
+        }
+
+        @keyframes sparkleFade {
+            0% {
+                opacity: 0.8;
+                transform: scale(1) translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0) translateY(-60px);
+            }
+        }
+
+        /* ============================================================
+           LITTLE PAWS TRAIL
+           ============================================================ */
+        .paw {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+            font-size: 16px;
+            opacity: 0;
+            animation: pawAppear 1.2s ease forwards;
+        }
+
+        @keyframes pawAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(var(--paw-rot, 0deg));
+            }
+
+            20% {
+                opacity: 0.6;
+                transform: scale(1.1) rotate(var(--paw-rot, 0deg));
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.8) rotate(var(--paw-rot, 0deg));
+            }
         }
     </style>
 </head>
-<body>
-    <div class="particles" id="particles"></div>
-    
-    <div class="container">
-        <h1>🌈 天气查询</h1>
-        <p class="subtitle">点击城市名可编辑</p>
-        
-        <div class="controls">
-            <button class="add-card-btn" onclick="addNewCard()">
-                ➕ 添加新卡片
-            </button>
-        </div>
 
-        <div class="cards-grid" id="cardsGrid"></div>
+<body>
+
+    <!-- Main text -->
+    <div class="scene">
+        <div class="text-wrapper" id="textWrapper">
+            <!-- Characters will be generated by JS -->
+        </div>
+        <div class="subtitle">♥ 聪不聪明 · 厉不厉害 ♥ </div>
     </div>
 
     <script>
-        // 天气数据模拟
-        const weatherTypes = ['sunny', 'cloudy', 'rainy', 'snowy', 'stormy'];
-        const weatherIcons = {
-            sunny: '☀️',
-            cloudy: '☁️',
-            rainy: '🌧️',
-            snowy: '❄️',
-            stormy: '⛈️'
-        };
-        const weatherDescriptions = {
-            sunny: '晴天',
-            cloudy: '多云',
-            rainy: '雨天',
-            snowy: '下雪',
-            stormy: '暴风雨'
-        };
+        /* ================================================================
+           CONFIG
+           ================================================================ */
+        const TEXT = '小孩姐我爱你';
+        const CHAR_COLORS = [
+            'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',  // 温暖粉
+            'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',  // 薰衣草紫
+            'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',  // 梦幻蓝粉
+            'linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)',  // 柔和粉灰
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',  // 甜蜜粉
+            'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',  // 暖阳橘
+        ];
+        const EAR_COLORS = [
+            '#ffb6c1', '#c7a5e0', '#a6c1ee', '#f0c4d8', '#f8a4b8', '#f9c874'
+        ];
 
-        // 初始城市数据
-        // Local storage key and helpers
-        const STORAGE_KEY = 'weather_cards_v1';
-        function loadCards() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const arr = JSON.parse(raw);
-                    if (Array.isArray(arr) && arr.every(o => o && typeof o.id === 'number' && typeof o.city === 'string')) {
-                        return arr;
-                    }
-                }
-            } catch (e) {}
-            return [
-                { id: 1, city: 'Beijing' },
-                { id: 2, city: 'Shanghai' },
-                { id: 3, city: 'Guangzhou' },
-                { id: 4, city: 'Chengdu' }
-            ];
-        }
-        function saveCards() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); } catch (e) {} }
+        /* ================================================================
+           1. BUILD CHARACTERS
+           ================================================================ */
+        const wrapper = document.getElementById('textWrapper');
+        const charEls = [];
 
-        let cards = loadCards();
+        TEXT.split('').forEach((ch, i) => {
+            const span = document.createElement('span');
+            span.className = 'char';
+            span.textContent = ch;
+            span.style.backgroundImage = CHAR_COLORS[i % CHAR_COLORS.length];
 
-        // 生成背景粒子
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = "particle";
-                particle.style.width = Math.random() * 60 + 20 + "px";
-                particle.style.height = particle.style.width;
-                particle.style.left = Math.random() * 100 + "%";
-                particle.style.animationDelay = Math.random() * 15 + "s";
-                particle.style.animationDuration = (Math.random() * 10 + 10) + "s";
-                particlesContainer.appendChild(particle);
-            }
-        }
-        function codeToType(code) {
-            code = Number(code);
-            if (code === 0) return 'sunny';
-            if (code >= 1 && code <= 3) return 'cloudy';
-            if (code === 45 || code === 48) return 'cloudy';
-            if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'rainy';
-            if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return 'snowy';
-            if (code >= 95) return 'stormy';
-            return 'cloudy';
-        }
+            // Jelly shine overlay
+            const shine = document.createElement('span');
+            // Ears (cute animal ears, visible on hover)
+            const earL = document.createElement('span');
+            earL.className = 'ear-left';
+            earL.style.background = EAR_COLORS[i % EAR_COLORS.length];
 
-        async function geocodeCity(name) {
-            const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=zh&format=json`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('地理编码失败');
-            const data = await res.json();
-            if (!data.results || !data.results.length) throw new Error('未找到该城市');
-            const r = data.results[0];
-            return { lat: r.latitude, lon: r.longitude, resolvedName: r.name };
-        }
+            const earR = document.createElement('span');
+            earR.className = 'ear-right';
+            earR.style.background = EAR_COLORS[i % EAR_COLORS.length];
 
-        async function fetchWeatherForCity(city) {
-            const { lat, lon, resolvedName } = await geocodeCity(city);
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&current=relative_humidity_2m&hourly=relative_humidity_2m&timezone=auto&forecast_days=1`;
-            const wRes = await fetch(weatherUrl);
-            if (!wRes.ok) throw new Error('天气获取失败');
-            const wJson = await wRes.json();
-            const cw = wJson.current_weather || {};
-            let humidity = (wJson.current && typeof wJson.current.relative_humidity_2m === 'number')
-                ? wJson.current.relative_humidity_2m
-                : null;
-            if (humidity == null && wJson.hourly && Array.isArray(wJson.hourly.time) && Array.isArray(wJson.hourly.relative_humidity_2m)) {
-                let idx = wJson.hourly.time.indexOf(cw.time);
-                if (idx === -1) {
-                    try {
-                        const cwDate = cw.time ? new Date(cw.time) : null;
-                        if (cwDate) {
-                            const times = wJson.hourly.time;
-                            for (let i = times.length - 1; i >= 0; i--) {
-                                const t = new Date(times[i]);
-                                if (t <= cwDate) { idx = i; break; }
-                            }
-                        }
-                    } catch (_) {}
-                }
-                if (idx === -1) idx = wJson.hourly.relative_humidity_2m.length - 1;
-                if (idx >= 0 && wJson.hourly.relative_humidity_2m[idx] != null) {
-                    humidity = wJson.hourly.relative_humidity_2m[idx];
-                }
-            }
-            let aqi = null;
-            try {
-                const aqUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=us_aqi&timezone=auto&forecast_days=1`;
-                const aqRes = await fetch(aqUrl);
-                if (aqRes.ok) {
-                    const aqJson = await aqRes.json();
-                    if (aqJson.hourly && Array.isArray(aqJson.hourly.time) && Array.isArray(aqJson.hourly.us_aqi)) {
-                        const idx = aqJson.hourly.time.indexOf(cw.time);
-                        aqi = idx !== -1 ? aqJson.hourly.us_aqi[idx] : aqJson.hourly.us_aqi[aqJson.hourly.us_aqi.length - 1];
-                    }
-                }
-            } catch (e) {}
-            return {
-                city: resolvedName || city,
-                temperature: cw.temperature,
-                wind: cw.windspeed,
-                weatherCode: cw.weathercode,
-                humidity,
-                aqi
-            };
-        }
+            // Blush (hover)
+            const blushL = document.createElement('span');
+            blushL.className = 'blush-left';
+            const blushR = document.createElement('span');
+            blushR.className = 'blush-right';
 
-        function updateCardWithData(card, data) {
-            const type = codeToType(data.weatherCode);
-            card.classList.remove('loading', 'sunny', 'cloudy', 'rainy', 'snowy', 'stormy');
-            card.classList.add(type);
-            const cityInput = card.querySelector('.city-name');
-            if (cityInput && data.city) cityInput.value = data.city;
-            const iconEl = card.querySelector('.weather-icon');
-            if (iconEl) iconEl.textContent = weatherIcons[type] || '⛅';
-            const tempEl = card.querySelector('.temperature');
-            if (tempEl) tempEl.textContent = `${Math.round(data.temperature)}°C`;
-            const descEl = card.querySelector('.weather-desc');
-            if (descEl) descEl.textContent = weatherDescriptions[type] || '';
-            const humEl = card.querySelector('.detail-value[data-field="humidity"]');
-            if (humEl) humEl.textContent = (data.humidity ?? '--') + (data.humidity != null ? '%' : '');
-            const windEl = card.querySelector('.detail-value[data-field="wind"]');
-            if (windEl) windEl.textContent = (data.wind != null ? Math.round(data.wind) + 'km/h' : '--');
-            const aqiEl = card.querySelector('.detail-value[data-field="aqi"]');
-            if (aqiEl) aqiEl.textContent = (data.aqi != null ? Math.round(data.aqi) : '--');
-        }
+            span.appendChild(earL);
+            span.appendChild(earR);
+            span.appendChild(blushL);
+            span.appendChild(blushR);
 
-        async function fetchAndRender(card, city) {
-            try {
-                card.classList.add('loading');
-                const data = await fetchWeatherForCity(city);
-                updateCardWithData(card, data);
-            } catch (e) {
-                card.classList.remove('loading');
-                const descEl = card.querySelector('.weather-desc');
-                if (descEl) descEl.textContent = '获取失败';
-            }
-        }
-function createWeatherCard(cardData) {
-    const card = document.createElement('div');
-    card.className = 'weather-card loading';
-    card.style.animationDelay = (Math.random() * 0.3) + 's';
+            wrapper.appendChild(span);
+            charEls.push(span);
+        });
 
-    card.innerHTML = `
-        <div class="card-header">
-            <input 
-                type="text" 
-                class="city-name" 
-                value="${cardData.city}"
-                onchange="updateCity(${cardData.id}, this.value, this)"
-                onclick="event.stopPropagation()"
-            />
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteCard(${cardData.id})" title="删除卡片">✕</button>
-        </div>
+        /* ================================================================
+           2. ENTRANCE ANIMATION — chars run in like little animals
+           ================================================================ */
+        const enterDirections = [
+            { x: -300, y: 200, rot: -30 },   // bottom-left
+            { x: 0, y: -300, rot: 15 },       // top
+            { x: 300, y: 200, rot: 25 },      // bottom-right
+            { x: -250, y: -150, rot: -20 },   // top-left
+            { x: 250, y: -200, rot: 20 },     // top-right
+            { x: 0, y: 350, rot: -10 },       // bottom
+        ];
 
-        <div class="weather-icon">⏳</div>
-        
-        <div class="temperature">--°C</div>
-        <div class="weather-desc">加载中…</div>
+        charEls.forEach((el, i) => {
+            const dir = enterDirections[i % enterDirections.length];
+            el.style.setProperty('--enter-x', `${dir.x}px`);
+            el.style.setProperty('--enter-y', `${dir.y}px`);
+            el.style.setProperty('--enter-rot', `${dir.rot}deg`);
+            el.style.setProperty('--enter-duration', `${1.0 + Math.random() * 0.4}s`);
 
-        <div class="weather-details">
-            <div class="detail-item">
-                <div class="detail-icon">💧</div>
-                <div class="detail-label">湿度</div>
-                <div class="detail-value" data-field="humidity">--</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-icon">🍃</div>
-                <div class="detail-label">风速</div>
-                <div class="detail-value" data-field="wind">--</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-icon">🫧</div>
-                <div class="detail-label">空气质量</div>
-                <div class="detail-value" data-field="aqi">--</div>
-            </div>
-        </div>
-
-        <div class="refresh-icon" onclick="event.stopPropagation(); refreshCard(${cardData.id}, event)" title="刷新天气">
-            🔄
-        </div>
-    `;
-
-    fetchAndRender(card, cardData.city);
-    return card;
-}
-
-        // 渲染所有卡片
-                function renderCards() {
-            const grid = document.getElementById('cardsGrid');
-            grid.innerHTML = '';
-            cards.forEach(cardData => {
-                const card = createWeatherCard(cardData);
-                grid.appendChild(card);
-            });
-        }
-
-        // 新增卡片
-        function addNewCard() {
-            const newId = cards.length > 0 ? Math.max(...cards.map(c => c.id)) + 1 : 1;
-                        const cities = ['Beijing', 'Nanjing', 'Xiamen', 'Hangzhou', 'Guangzhou', 'Changsha', 'Qingdao', 'Tianjin', 'Chongqing', 'Wuhan'];
-            const randomCity = cities[Math.floor(Math.random() * cities.length)];
-            cards.push({ id: newId, city: randomCity });
-            saveCards();
-            renderCards();
-        }
-
-        // 删除卡片
-        function deleteCard(id) {
-            if (cards.length <= 1) {
-                alert('至少保留一张卡片哦~');
-                return;
-            }
-            cards = cards.filter(card => card.id !== id);
-            saveCards();
-            renderCards();
-        }
-
-        // 更新城市并重新拉取
-        function updateCity(id, newCity, inputEl) {
-    const card = cards.find(c => c.id === id);
-    if (card) {
-        card.city = newCity || '未命名城市';
-        saveCards();
-        const cardElement = inputEl && inputEl.closest ? inputEl.closest('.weather-card') : null;
-        if (cardElement) {
-            fetchAndRender(cardElement, card.city);
-        } else {
-            renderCards();
-        }
-    }
-}
-
-        // 刷新单张卡片（重新获取真实天气）
-        function refreshCard(id, event) {
-            const cardData = cards.find(c => c.id === id);
-            if (!cardData) return;
-            const cardElement = event.target.closest('.weather-card');
-            if (!cardElement) return;
-            cardElement.style.animation = 'none';
+            // Stagger entrance
             setTimeout(() => {
-                cardElement.style.animation = 'cardFadeIn 0.6s ease';
-            }, 10);
-            const city = cardElement.querySelector('.city-name')?.value || cardData.city;
-            fetchAndRender(cardElement, city);
+                el.classList.add('entering');
+            }, 300 + i * 280);
+        });
+
+        /* ================================================================
+           3. IDLE ANIMATIONS — random fidgets every few seconds
+           ================================================================ */
+        const idleClasses = ['idle-bounce', 'idle-wiggle', 'idle-squish', 'idle-peek', 'idle-jiggle'];
+
+        function triggerIdleAnimation() {
+            // Pick a random character
+            const idx = Math.floor(Math.random() * charEls.length);
+            const el = charEls[idx];
+
+            // Don't interrupt entrance or another idle
+            if (el.classList.contains('entering')) return;
+            for (const cls of idleClasses) {
+                if (el.classList.contains(cls)) return;
+            }
+
+            // Pick random animation
+            const anim = idleClasses[Math.floor(Math.random() * idleClasses.length)];
+            el.classList.add(anim);
+
+            // Remove after animation ends
+            el.addEventListener('animationend', () => {
+                el.classList.remove(anim);
+            }, { once: true });
         }
 
-        // 初始化
-        createParticles();
-        renderCards();
-        saveCards();
+        // Start idle loop after entrance completes
+        const entranceDuration = 300 + charEls.length * 280 + 1400;
+        setTimeout(() => {
+            // Trigger idle animations at random intervals (2-5s)
+            function scheduleIdle() {
+                const delay = 1500 + Math.random() * 2500;
+                setTimeout(() => {
+                    triggerIdleAnimation();
+                    // Sometimes trigger two chars at once for fun
+                    if (Math.random() < 0.3) {
+                        setTimeout(triggerIdleAnimation, 150);
+                    }
+                    scheduleIdle();
+                }, delay);
+            }
+            scheduleIdle();
+        }, entranceDuration);
 
-        // 如需自动刷新真实数据，可启用以下代码（默认关闭）
-        // setInterval(() => {
-        //     document.querySelectorAll('.weather-card').forEach(card => {
-        //         const city = card.querySelector('.city-name')?.value;
-        //         if (city) fetchAndRender(card, city);
-        //     });
-        // }, 10 * 60 * 1000);
+        /* ================================================================
+           4. CLICK — hearts & sparkles burst
+           ================================================================ */
+        charEls.forEach(el => {
+            el.addEventListener('click', e => {
+                const symbols = ['💖', '💕', '🌸', '✨', '💗', '🎀', '🩷', '⭐'];
+                for (let i = 0; i < 10; i++) {
+                    const h = document.createElement('div');
+                    h.className = 'click-heart';
+                    h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    h.style.left = e.clientX + 'px';
+                    h.style.top = e.clientY + 'px';
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = 50 + Math.random() * 100;
+                    h.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+                    h.style.setProperty('--dy', `${Math.sin(angle) * dist - 60}px`);
+                    h.style.setProperty('--rot', `${Math.random() * 360 - 180}deg`);
+                    h.style.fontSize = (16 + Math.random() * 20) + 'px';
+                    document.body.appendChild(h);
+                    setTimeout(() => h.remove(), 1000);
+                }
+            });
+        });
+
+        /* ================================================================
+           5. FLOATING DECORATIONS — cute emoji background (CSS only, no canvas)
+           ================================================================ */
+        const decoEmoji = ['🌸', '🩷', '⭐', '🎀', '🌷', '🍬', '🦋', '✨', '💫', '🌈', '🍡', '🐾'];
+
+        function spawnDeco() {
+            const d = document.createElement('div');
+            d.className = 'deco';
+            d.textContent = decoEmoji[Math.floor(Math.random() * decoEmoji.length)];
+            d.style.left = Math.random() * 100 + 'vw';
+            d.style.bottom = '-40px';
+            d.style.fontSize = (18 + Math.random() * 24) + 'px';
+            d.style.opacity = 0.2 + Math.random() * 0.3;
+            const dur = 10 + Math.random() * 12;
+            d.style.animationDuration = dur + 's';
+            d.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), (dur + 2) * 1000);
+        }
+
+        // Spawn initial batch
+        for (let i = 0; i < 8; i++) {
+            setTimeout(spawnDeco, Math.random() * 3000);
+        }
+        // Keep spawning
+        setInterval(spawnDeco, 1800);
+
+        /* ================================================================
+           6. MOUSE TRAIL — cute paw prints 🐾
+           ================================================================ */
+        let lastPawTime = 0;
+        document.addEventListener('mousemove', e => {
+            const now = Date.now();
+            if (now - lastPawTime < 180) return; // throttle
+            lastPawTime = now;
+
+            if (Math.random() < 0.5) {
+                const paw = document.createElement('div');
+                paw.className = 'paw';
+                paw.textContent = '🐾';
+                paw.style.left = (e.clientX - 8 + (Math.random() - 0.5) * 10) + 'px';
+                paw.style.top = (e.clientY - 8 + (Math.random() - 0.5) * 10) + 'px';
+                paw.style.setProperty('--paw-rot', `${Math.random() * 40 - 20}deg`);
+                paw.style.fontSize = (14 + Math.random() * 6) + 'px';
+                document.body.appendChild(paw);
+                setTimeout(() => paw.remove(), 1200);
+            }
+        });
+
+        /* ================================================================
+           7. OCCASIONAL SPARKLES around text
+           ================================================================ */
+        setInterval(() => {
+            const wrapper = document.getElementById('textWrapper');
+            const rect = wrapper.getBoundingClientRect();
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            const x = rect.left + Math.random() * rect.width;
+            const y = rect.top + Math.random() * rect.height;
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            const hue = 300 + Math.random() * 60;
+            const size = 4 + Math.random() * 6;
+            sparkle.style.width = size + 'px';
+            sparkle.style.height = size + 'px';
+            sparkle.style.background = `hsl(${hue}, 80%, 75%)`;
+            sparkle.style.boxShadow = `0 0 ${size * 2}px hsl(${hue}, 80%, 70%)`;
+            document.body.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), 2500);
+        }, 600);
     </script>
 </body>
+
 </html>
